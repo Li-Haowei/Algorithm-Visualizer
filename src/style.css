@@ -1,0 +1,25 @@
+#board td{
+    /*space out each cell*/
+    padding: 0 7px;
+}
+#board {
+    margin: 10px 10px;
+}
+#board td {
+    border: 1px solid #14eea5;
+    text-align: center;
+    vertical-align: middle;
+    height: 10px;
+    width: auto;
+    font-weight: bold;
+    background-color: antiquewhite;
+}
+#container {
+    display: flex;
+    justify-content: center;
+    background-color: black;
+}
+#controller{
+    text-align: center;
+    background-color: antiquewhite;
+}
