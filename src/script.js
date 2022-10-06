@@ -154,14 +154,17 @@ class AI{
         this.approach = 0;
         this.board = board;
         this.visited = new Set([]);
+        this.path = [];
         this.findPath();
+        this.found = false;
     }
     findPath(){
         //Brutal force approach
         if(this.board.start && this.board.end){
             var rowOfStart = this.board.board.findIndex(row => row.includes('S'));
             var colOfStart = this.board.board[rowOfStart].findIndex(col => col == 'S');
-            
+            this.visited.add(`${rowOfStart}-${colOfStart}`);
+            this.path.push(`${rowOfStart}-${colOfStart}`);
             var rowOfEnd = this.board.board.findIndex(row => row.includes('E'));
             var colOfEnd = this.board.board[rowOfEnd].findIndex(col => col == 'E');    
             
@@ -203,19 +206,20 @@ class AI{
                 //this.visited.add(`${row}-${col-1}`);
             }
         }
+        //console.log(neighbors);
         return neighbors;
     }
 
-    findPathHelper(rowOfStart, colOfStart, rowOfEnd, colOfEnd){
+    async findPathHelper(rowOfStart, colOfStart, rowOfEnd, colOfEnd){
         var possiblePaths = this.updateNeighbors(rowOfStart, colOfStart);
         /*Calculate the distance between the start point and the end point*/
-        var distance1 = Math.sqrt(Math.pow(rowOfStart-colOfStart, 2) + Math.pow(rowOfEnd-colOfEnd, 2));
+        var distance1 = Math.sqrt(Math.pow(rowOfStart-rowOfEnd, 2) + Math.pow(colOfStart-colOfEnd, 2));
         var optimalPath = 10000000000;
         for (let i = 0; i < possiblePaths.length; i++) {
             const move = possiblePaths[i];
             /*Calculate the distance between the current move and the end point*/
             var distance2 = Math.sqrt(Math.pow(move[0]-rowOfEnd, 2) + Math.pow(move[1]-colOfEnd, 2));
-            if(distance2 < distance1 && this.board.board[move[0]][move[1]] != 'O' && this.board.board[move[0]][move[1]] != 'S' && this.board.board[move[0]][move[1]] != 'E'){
+            if(distance2 < optimalPath && this.board.board[move[0]][move[1]] != 'O' && this.board.board[move[0]][move[1]] != 'S' && this.board.board[move[0]][move[1]] != 'E' && this.board.board[move[0]][move[1]] != 'X'){
                 //find better path
                 if(distance2 < optimalPath){
                     optimalPath = distance2;
@@ -223,23 +227,43 @@ class AI{
                     colOfStart = move[1];
                 }
             }
+            if(this.board.board[move[0]][move[1]] == 'O'){
+                console.log("hit wall");
+                this.visited.add(`${rowOfStart}-${colOfStart}`);
+            }
             if (this.board.board[move[0]][move[1]] == 'E') {
                 console.log("Found the end");
+                this.found = true;
                 return;
             }
                 
         }
         if(optimalPath != 10000000000){
-            this.board.board[rowOfStart][colOfStart] = 'O';
+            this.board.board[rowOfStart][colOfStart] = 'X';
             /*Update the board view*/
             var cell = document.getElementById(`${rowOfStart}-${colOfStart}`);
             /*Mark as visited*/
-            this.visited.add(`${rowOfStart}-${colOfStart}`);
-            cell.style.backgroundColor = "yellow";
+            this.path.push(`${rowOfStart}-${colOfStart}`);
+            //this.visited.add(`${rowOfStart}-${colOfStart}`);
+            cell.style.backgroundColor = "black";
+            await sleep(100);
             this.findPathHelper(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
+            return
         }
+        if(!this.found && this.path.length > 0){
+            var lastMove = this.path.pop();
+            //console.log(lastMove);
+            this.visited.add(`${rowOfStart}-${colOfStart}`);
+            var row = parseInt(lastMove.split('-')[0]);
+            var col = parseInt(lastMove.split('-')[1]);
+            this.findPathHelper(row, col, rowOfEnd, colOfEnd);
+        }
+
     }
     
+}
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 
