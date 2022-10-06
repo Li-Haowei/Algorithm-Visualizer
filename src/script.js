@@ -4,7 +4,6 @@ var currentMode = 0;
 var start = document.getElementById('draw-start');
 var end = document.getElementById('draw-end');
 var wall = document.getElementById('draw-wall');
-console.log(start, end, wall);
 //Run functions when document is ready
 document.addEventListener("DOMContentLoaded", function() {
     //Create a new instance of the game
@@ -12,6 +11,8 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("reset").addEventListener("click", function() {
         document.getElementById("board").innerHTML = "";
         game = new Game();
+        start.disabled = false;
+        end.disabled = false;
     });
     start = document.getElementById('draw-start');
     end = document.getElementById('draw-end');
@@ -152,63 +153,88 @@ class AI{
         //Initialize the AI
         this.approach = 0;
         this.board = board;
-        this.brutalForce();
+        this.visited = new Set([]);
+        this.findPath();
     }
-    brutalForce(){
+    findPath(){
         //Brutal force approach
         if(this.board.start && this.board.end){
             var rowOfStart = this.board.board.findIndex(row => row.includes('S'));
             var colOfStart = this.board.board[rowOfStart].findIndex(col => col == 'S');
-            this.brutalForceHelper(rowOfStart, colOfStart);
-            //var rowOfEnd = this.board.board.findIndex(row => row.includes('E'));
-            //var colOfEnd = this.board.board[rowOfEnd].findIndex(col => col == 'E');    
+            
+            var rowOfEnd = this.board.board.findIndex(row => row.includes('E'));
+            var colOfEnd = this.board.board[rowOfEnd].findIndex(col => col == 'E');    
+            
+            this.findPathHelper(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
         }
     
     }
-    brutalForceHelper(row, col){
-        if(row == this.board.rows || col == this.board.columns || row < 0 || col < 0){
-            return;
+    updateNeighbors(row, col){
+        var neighbors = [];
+        if(row<this.board.rows-1){
+            //If haven't visited
+            if(!this.visited.has(`${row+1}-${col}`)){
+                neighbors.push([row+1, col]);
+                //Mark as visited
+                this.visited.add(`${row+1}-${col}`);
+            }
         }
-        if(this.board.board[row][col] == 'S'){
-            
+        if(row>1){
+            //If haven't visited
+            if(!this.visited.has(`${row-1}-${col}`)){
+                neighbors.push([row-1, col]);
+                //Mark as visited
+                this.visited.add(`${row-1}-${col}`);
+            }
         }
-        else if(this.board.board[row][col] == 'E'){
-            console.log('found');
-            return;
+        if (col<this.board.columns-1) {
+            //If haven't visited
+            if(!this.visited.has(`${row}-${col+1}`)){
+                neighbors.push([row, col+1]);
+                //Mark as visited
+                this.visited.add(`${row}-${col+1}`);
+            }
         }
-        else if(this.board.board[row][col] == 'O'){
-            return;
+        if (col>1) {
+            //If haven't visited
+            if(!this.visited.has(`${row}-${col-1}`)){
+                neighbors.push([row, col-1]);
+                //Mark as visited
+                this.visited.add(`${row}-${col-1}`);
+            }
         }
-        else {
-            this.board.board[row][col] = 'X';
-            document.getElementById(`${row}-${col}`).style.backgroundColor = "yellow";
+        if(neighbors.length == 0){
+            this.updateNeighbors(row+1, col);
+            this.updateNeighbors(row, col+1);
+            this.updateNeighbors(row-1, col);
+            this.updateNeighbors(row, col-1);
         }
-        if (row-1 >= 0 && col-1 >= 0) {
-            this.brutalForceHelper(row-1, col-1);
+        console.log('run');
+        return neighbors;
+    }
+
+    findPathHelper(rowOfStart, colOfStart, rowOfEnd, colOfEnd){
+        var possiblePaths = this.updateNeighbors(rowOfStart, colOfStart);
+        for (let i = 0; i < possiblePaths.length; i++) {
+            const move = possiblePaths[i];
+            /*Calculate the distance between the start point and the end point*/
+            var distance1 = Math.sqrt(Math.pow(rowOfStart-colOfStart, 2) + Math.pow(rowOfEnd-colOfEnd, 2));
+            /*Calculate the distance between the current move and the end point*/
+            var distance2 = Math.sqrt(Math.pow(move[0]-rowOfEnd, 2) + Math.pow(move[1]-colOfEnd, 2));
+            if(distance2 < distance1 && this.board.board[move[0]][move[1]] != 'O' && this.board.board[move[0]][move[1]] != 'S' && this.board.board[move[0]][move[1]] != 'E'){
+                this.board.board[move[0]][move[1]] = 'X';
+                /*Update the board view*/
+                var cell = document.getElementById(`${move[0]}-${move[1]}`);
+                cell.style.backgroundColor = "yellow";
+                this.findPathHelper(move[0], move[1], rowOfEnd, colOfEnd);
+            }
+            if (this.board.board[move[0]][move[1]] == 'E') {
+                console.log("Found the end");
+                return;
+            }
+                
         }
-        if (row + 1  <= this.board.rows - 1 && col + 1 <= this.board.columns - 1) {
-            this.brutalForceHelper(row+1, col+1);
-        }
-        if (row - 1 >= 0 && col + 1 <= this.board.columns - 1) {
-            this.brutalForceHelper(row-1, col+1);
-        }
-        if (row + 1 <= this.board.rows - 1 && col - 1 >= 0) {
-            this.brutalForceHelper(row+1, col-1);
-        }
-        if (row - 1 >= 0) {
-            this.brutalForceHelper(row-1, col);
-        }
-        if (row + 1 <= this.board.rows - 1) {
-            this.brutalForceHelper(row+1, col);
-        }
-        if (col - 1 >= 0) {
-            this.brutalForceHelper(row, col-1);
-        }
-        if (col + 1 <= this.board.columns - 1) {
-            console.log('right');
-            this.brutalForceHelper(row, col+1);
-        }
-        return;
+        
     }
     
 }
