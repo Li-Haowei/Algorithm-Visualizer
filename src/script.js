@@ -105,6 +105,16 @@ class Board {
                                     game.board.board[r][c] = 'S';
                                     e.target.style.backgroundColor = "green";
                                     game.board.start = true;
+
+                                    if(!game.board.end){
+                                        end.checked = true;
+                                        currentMode = 2;
+                                    }else{
+                                        wall.checked = true;
+                                        currentMode = 0;
+                                    }
+                                    start.checked = false;
+                                    start.disabled = true;
                                 }
                                 break;
                             case 2:
@@ -112,6 +122,15 @@ class Board {
                                     game.board.board[r][c] = 'E';
                                     e.target.style.backgroundColor = "red";
                                     game.board.end = true;
+                                    if(!game.board.start){
+                                        start.checked = true;
+                                        currentMode = 2;
+                                    }else{
+                                        wall.checked = true;
+                                        currentMode = 0;
+                                    }
+                                    end.checked = false;
+                                    end.disabled = true;
                                 }
                                 break;
                             default:
@@ -165,46 +184,31 @@ class AI{
             document.getElementById(`${row}-${col}`).style.backgroundColor = "yellow";
         }
         if (row-1 >= 0 && col-1 >= 0) {
-            console.log(row, col, "WTF")
             this.brutalForceHelper(row-1, col-1);
-        }else{
-            return;
         }
         if (row + 1  <= this.board.rows - 1 && col + 1 <= this.board.columns - 1) {
             this.brutalForceHelper(row+1, col+1);
-        }else{
-            return;
         }
         if (row - 1 >= 0 && col + 1 <= this.board.columns - 1) {
             this.brutalForceHelper(row-1, col+1);
-        }else{
-            return;
         }
         if (row + 1 <= this.board.rows - 1 && col - 1 >= 0) {
             this.brutalForceHelper(row+1, col-1);
-        }else{
-            return;
         }
         if (row - 1 >= 0) {
             this.brutalForceHelper(row-1, col);
-        }else{
-            return;
         }
         if (row + 1 <= this.board.rows - 1) {
             this.brutalForceHelper(row+1, col);
-        }else{
-            return;
         }
         if (col - 1 >= 0) {
             this.brutalForceHelper(row, col-1);
-        }else{
-            return;
         }
         if (col + 1 <= this.board.columns - 1) {
+            console.log('right');
             this.brutalForceHelper(row, col+1);
-        }else{
-            return;
         }
+        return;
     }
     
 }
