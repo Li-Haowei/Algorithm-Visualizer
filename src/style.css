@@ -12,6 +12,7 @@
     height: 10px;
     width: auto;
     font-weight: bold;
+    overflow: hidden;
     background-color: antiquewhite;
 }
 #container {

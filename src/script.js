@@ -1,7 +1,37 @@
+//global variable to hold the game instance
+var game;
+var currentMode = 0;
+var start = document.getElementById('draw-start');
+var end = document.getElementById('draw-end');
+var wall = document.getElementById('draw-wall');
+console.log(start, end, wall);
 //Run functions when document is ready
 document.addEventListener("DOMContentLoaded", function() {
     //Create a new instance of the game
-    var game = new Game();
+    game = new Game();
+    document.getElementById("reset").addEventListener("click", function() {
+        document.getElementById("board").innerHTML = "";
+        game = new Game();
+    });
+    start = document.getElementById('draw-start');
+    end = document.getElementById('draw-end');
+    wall = document.getElementById('draw-wall');
+
+    start.addEventListener('click', function() {
+        end.checked = false;
+        wall.checked = false;
+        currentMode = 1;
+    });
+    end.addEventListener('click', function(){
+        start.checked = false;
+        wall.checked = false;
+        currentMode = 2;
+    });
+    wall.addEventListener('click', function(){
+        start.checked = false;
+        end.checked = false;
+        currentMode = 0;
+    });    
 });
 
 //Create a game class
@@ -10,8 +40,6 @@ function Game() {
     this.board = new Board(80, 100);
     //Create a new instance of the AI
     this.ai = new AI();
-    //Create a new instance of the game controller
-    this.gameController = new GameController();
 }
 
 //Create a board class
@@ -43,8 +71,25 @@ class Board {
                 cell.setAttribute("id", `${rowNum}-${colNum}`);
                 cell.innerHTML = this.board[rowNum][colNum];
                 cell.addEventListener("mouseover", function(e){
-                    if(e.buttons == 1 || e.buttons == 3){
-                        e.target.style.backgroundColor = "green";
+                    if(e.buttons == 2 || e.buttons == 3){
+                        var r = parseInt(e.target.id.split('-')[0]);
+                        var c = parseInt(e.target.id.split('-')[1]);
+                        switch (currentMode) {
+                            case 0:
+                                game.board.board[r][c] = 'O';
+                                e.target.style.backgroundColor = "green";
+                                break;
+                            case 1:
+                                game.board.board[r][c] = 'S';
+                                e.target.style.backgroundColor = "red";
+                                break;
+                            case 2:
+                                game.board.board[r][c] = 'E';
+                                e.target.style.backgroundColor = "blue";
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     return false;
                 });
@@ -60,21 +105,6 @@ function AI() {
     
 }
 
-//Create a game controller class
-class GameController {
-    constructor(){
-        this.currentMode = this.whichMode();
-    }
-    whichMode() {
-        if(document.getElementById('draw-wall').checked) {
-            return 0;
-        }else if(document.getElementById('draw-start').checked) {
-            return 1;
-        }else if(document.getElementById('draw-end').checked) {
-            return 2;
-        }
-    }
 
-}
 
 
