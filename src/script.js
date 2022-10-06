@@ -32,6 +32,9 @@ document.addEventListener("DOMContentLoaded", function() {
         end.checked = false;
         currentMode = 0;
     });    
+    document.getElementById("start").addEventListener("click", function() {
+        this.ai = new AI(game.board);
+    });
 });
 
 //Create a game class
@@ -39,7 +42,7 @@ function Game() {
     //Create a new instance of the board
     this.board = new Board(80, 100);
     //Create a new instance of the AI
-    this.ai = new AI();
+    this.ai = new AI(this.board);
 }
 
 //Create a board class
@@ -52,6 +55,8 @@ class Board {
         this.board = [];
         this.initBoardView();
         this.initHtmlBoardView();
+        this.start = false;
+        this.end = false;
     }
     //Initialize the board view
     initBoardView() {
@@ -77,20 +82,41 @@ class Board {
                         switch (currentMode) {
                             case 0:
                                 game.board.board[r][c] = 'O';
-                                e.target.style.backgroundColor = "green";
+                                e.target.style.backgroundColor = "blue";
                                 break;
                             case 1:
-                                game.board.board[r][c] = 'S';
-                                e.target.style.backgroundColor = "red";
                                 break;
                             case 2:
-                                game.board.board[r][c] = 'E';
-                                e.target.style.backgroundColor = "blue";
                                 break;
                             default:
                                 break;
                         }
                     }
+                    return false;
+                });
+                cell.addEventListener("click", function(e){
+                        var r = parseInt(e.target.id.split('-')[0]);
+                        var c = parseInt(e.target.id.split('-')[1]);
+                        switch (currentMode) {
+                            case 0:
+                                break;
+                            case 1:
+                                if(!game.board.start){
+                                    game.board.board[r][c] = 'S';
+                                    e.target.style.backgroundColor = "green";
+                                    game.board.start = true;
+                                }
+                                break;
+                            case 2:
+                                if(!game.board.end){
+                                    game.board.board[r][c] = 'E';
+                                    e.target.style.backgroundColor = "red";
+                                    game.board.end = true;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     return false;
                 });
                 row.appendChild(cell);
@@ -101,10 +127,87 @@ class Board {
 }
 
 //Create a AI class
-function AI() {
+class AI{
+    //constructor
+    constructor(board){
+        //Initialize the AI
+        this.approach = 0;
+        this.board = board;
+        this.brutalForce();
+    }
+    brutalForce(){
+        //Brutal force approach
+        if(this.board.start && this.board.end){
+            var rowOfStart = this.board.board.findIndex(row => row.includes('S'));
+            var colOfStart = this.board.board[rowOfStart].findIndex(col => col == 'S');
+            this.brutalForceHelper(rowOfStart, colOfStart);
+            //var rowOfEnd = this.board.board.findIndex(row => row.includes('E'));
+            //var colOfEnd = this.board.board[rowOfEnd].findIndex(col => col == 'E');    
+        }
+    
+    }
+    brutalForceHelper(row, col){
+        if(row == this.board.rows || col == this.board.columns || row < 0 || col < 0){
+            return;
+        }
+        if(this.board.board[row][col] == 'S'){
+            
+        }
+        else if(this.board.board[row][col] == 'E'){
+            console.log('found');
+            return;
+        }
+        else if(this.board.board[row][col] == 'O'){
+            return;
+        }
+        else {
+            this.board.board[row][col] = 'X';
+            document.getElementById(`${row}-${col}`).style.backgroundColor = "yellow";
+        }
+        if (row-1 >= 0 && col-1 >= 0) {
+            console.log(row, col, "WTF")
+            this.brutalForceHelper(row-1, col-1);
+        }else{
+            return;
+        }
+        if (row + 1  <= this.board.rows - 1 && col + 1 <= this.board.columns - 1) {
+            this.brutalForceHelper(row+1, col+1);
+        }else{
+            return;
+        }
+        if (row - 1 >= 0 && col + 1 <= this.board.columns - 1) {
+            this.brutalForceHelper(row-1, col+1);
+        }else{
+            return;
+        }
+        if (row + 1 <= this.board.rows - 1 && col - 1 >= 0) {
+            this.brutalForceHelper(row+1, col-1);
+        }else{
+            return;
+        }
+        if (row - 1 >= 0) {
+            this.brutalForceHelper(row-1, col);
+        }else{
+            return;
+        }
+        if (row + 1 <= this.board.rows - 1) {
+            this.brutalForceHelper(row+1, col);
+        }else{
+            return;
+        }
+        if (col - 1 >= 0) {
+            this.brutalForceHelper(row, col-1);
+        }else{
+            return;
+        }
+        if (col + 1 <= this.board.columns - 1) {
+            this.brutalForceHelper(row, col+1);
+        }else{
+            return;
+        }
+    }
     
 }
-
 
 
 
