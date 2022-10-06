@@ -176,7 +176,7 @@ class AI{
             if(!this.visited.has(`${row+1}-${col}`)){
                 neighbors.push([row+1, col]);
                 //Mark as visited
-                this.visited.add(`${row+1}-${col}`);
+                //this.visited.add(`${row+1}-${col}`);
             }
         }
         if(row>1){
@@ -184,7 +184,7 @@ class AI{
             if(!this.visited.has(`${row-1}-${col}`)){
                 neighbors.push([row-1, col]);
                 //Mark as visited
-                this.visited.add(`${row-1}-${col}`);
+                //this.visited.add(`${row-1}-${col}`);
             }
         }
         if (col<this.board.columns-1) {
@@ -192,7 +192,7 @@ class AI{
             if(!this.visited.has(`${row}-${col+1}`)){
                 neighbors.push([row, col+1]);
                 //Mark as visited
-                this.visited.add(`${row}-${col+1}`);
+                //this.visited.add(`${row}-${col+1}`);
             }
         }
         if (col>1) {
@@ -200,33 +200,28 @@ class AI{
             if(!this.visited.has(`${row}-${col-1}`)){
                 neighbors.push([row, col-1]);
                 //Mark as visited
-                this.visited.add(`${row}-${col-1}`);
+                //this.visited.add(`${row}-${col-1}`);
             }
         }
-        if(neighbors.length == 0){
-            this.updateNeighbors(row+1, col);
-            this.updateNeighbors(row, col+1);
-            this.updateNeighbors(row-1, col);
-            this.updateNeighbors(row, col-1);
-        }
-        console.log('run');
         return neighbors;
     }
 
     findPathHelper(rowOfStart, colOfStart, rowOfEnd, colOfEnd){
         var possiblePaths = this.updateNeighbors(rowOfStart, colOfStart);
+        /*Calculate the distance between the start point and the end point*/
+        var distance1 = Math.sqrt(Math.pow(rowOfStart-colOfStart, 2) + Math.pow(rowOfEnd-colOfEnd, 2));
+        var optimalPath = 10000000000;
         for (let i = 0; i < possiblePaths.length; i++) {
             const move = possiblePaths[i];
-            /*Calculate the distance between the start point and the end point*/
-            var distance1 = Math.sqrt(Math.pow(rowOfStart-colOfStart, 2) + Math.pow(rowOfEnd-colOfEnd, 2));
             /*Calculate the distance between the current move and the end point*/
             var distance2 = Math.sqrt(Math.pow(move[0]-rowOfEnd, 2) + Math.pow(move[1]-colOfEnd, 2));
             if(distance2 < distance1 && this.board.board[move[0]][move[1]] != 'O' && this.board.board[move[0]][move[1]] != 'S' && this.board.board[move[0]][move[1]] != 'E'){
-                this.board.board[move[0]][move[1]] = 'X';
-                /*Update the board view*/
-                var cell = document.getElementById(`${move[0]}-${move[1]}`);
-                cell.style.backgroundColor = "yellow";
-                this.findPathHelper(move[0], move[1], rowOfEnd, colOfEnd);
+                //find better path
+                if(distance2 < optimalPath){
+                    optimalPath = distance2;
+                    rowOfStart = move[0];
+                    colOfStart = move[1];
+                }
             }
             if (this.board.board[move[0]][move[1]] == 'E') {
                 console.log("Found the end");
@@ -234,7 +229,15 @@ class AI{
             }
                 
         }
-        
+        if(optimalPath != 10000000000){
+            this.board.board[rowOfStart][colOfStart] = 'O';
+            /*Update the board view*/
+            var cell = document.getElementById(`${rowOfStart}-${colOfStart}`);
+            /*Mark as visited*/
+            this.visited.add(`${rowOfStart}-${colOfStart}`);
+            cell.style.backgroundColor = "yellow";
+            this.findPathHelper(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
+        }
     }
     
 }
