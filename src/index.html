@@ -14,15 +14,44 @@
     <title>Algorithm Visualizer</title>
 </head>
 <body>
+    <!--Create a navigation bar-->
+        <div class="navbar">
+            <!--Each navbar item has dropdown list-->
+            <div class="dropdown">
+                <button class="dropbtn">Sorting
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a id="greedy-algorithm">Greedy Algorithm</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Action
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a id="reset">Reset</a>
+                    <a id="draw-wall">Draw Wall</a>
+                    <a id="draw-start">Draw Start</a>
+                    <a id="draw-end">Draw End</a>
+                </div>
+            </div>
+            <!--Counter-->
+            <div class="counter">
+                <p>Counter: <span id="counter">0</span></p>
+            </div>
+        </div>
+    <!--End of navigation bar-->
     <div id="container">
     <div id="board" oncontextmenu="return false;"></div>
     </div>
+    <!--Display none-->
     <div id="controller">
         <button id="reset">Reset</button><br>
         <input type="radio" id="draw-wall" value="Draw Wall" checked>Draw Wall<br>
         <input type="radio" id="draw-start" value="Draw Start">Draw Start<br>
         <input type="radio" id="draw-end" value="Draw End">Draw End<br>
-        <button id="start">Start</button><br>
     </div>
+    <!--End of Display none-->
 </body>
 </html>

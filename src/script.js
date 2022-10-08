@@ -1,9 +1,11 @@
 //global variable to hold the game instance
 var game;
-var currentMode = 0;
+
+var currentMode = 0; //use to indicate the mouse click event mode
 var start = document.getElementById('draw-start');
 var end = document.getElementById('draw-end');
 var wall = document.getElementById('draw-wall');
+var counter = 0; // to keep track of current count of total steps
 //Run functions when document is ready
 document.addEventListener("DOMContentLoaded", function() {
     //Create a new instance of the game
@@ -33,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
         end.checked = false;
         currentMode = 0;
     });    
-    document.getElementById("start").addEventListener("click", function() {
+    document.getElementById("greedy-algorithm").addEventListener("click", function() {
         this.ai = new AI(game.board);
     });
 });
@@ -77,6 +79,7 @@ class Board {
                 cell.setAttribute("id", `${rowNum}-${colNum}`);
                 cell.innerHTML = this.board[rowNum][colNum];
                 cell.addEventListener("mouseover", function(e){
+                    console.log(e.buttons);
                     if(e.buttons == 2 || e.buttons == 3){
                         var r = parseInt(e.target.id.split('-')[0]);
                         var c = parseInt(e.target.id.split('-')[1]);
@@ -168,7 +171,7 @@ class AI{
             var rowOfEnd = this.board.board.findIndex(row => row.includes('E'));
             var colOfEnd = this.board.board[rowOfEnd].findIndex(col => col == 'E');    
             
-            this.findPathHelper(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
+            this.greedy_algorithm(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
         }
     
     }
@@ -210,7 +213,7 @@ class AI{
         return neighbors;
     }
 
-    async findPathHelper(rowOfStart, colOfStart, rowOfEnd, colOfEnd){
+    async greedy_algorithm(rowOfStart, colOfStart, rowOfEnd, colOfEnd){
         var possiblePaths = this.updateNeighbors(rowOfStart, colOfStart);
         /*Calculate the distance between the start point and the end point*/
         var distance1 = Math.sqrt(Math.pow(rowOfStart-rowOfEnd, 2) + Math.pow(colOfStart-colOfEnd, 2));
@@ -246,17 +249,19 @@ class AI{
             this.path.push(`${rowOfStart}-${colOfStart}`);
             //this.visited.add(`${rowOfStart}-${colOfStart}`);
             cell.style.backgroundColor = "black";
+            incrementCounter();
             await sleep(100);
-            this.findPathHelper(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
+            this.greedy_algorithm(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
             return
         }
         if(!this.found && this.path.length > 0){
             var lastMove = this.path.pop();
             //console.log(lastMove);
+            decrementCounter();
             this.visited.add(`${rowOfStart}-${colOfStart}`);
             var row = parseInt(lastMove.split('-')[0]);
             var col = parseInt(lastMove.split('-')[1]);
-            this.findPathHelper(row, col, rowOfEnd, colOfEnd);
+            this.greedy_algorithm(row, col, rowOfEnd, colOfEnd);
         }
 
     }
@@ -266,5 +271,12 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-
+function incrementCounter(){
+    counter++;
+    document.getElementById("counter").innerHTML = counter;
+}
+function decrementCounter(){
+    counter--;
+    document.getElementById("counter").innerHTML = counter;
+}
 
