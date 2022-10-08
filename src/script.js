@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
         game = new Game();
         start.disabled = false;
         end.disabled = false;
+        counter = 0;
     });
     start = document.getElementById('draw-start');
     end = document.getElementById('draw-end');
