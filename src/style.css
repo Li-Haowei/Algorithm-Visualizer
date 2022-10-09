@@ -98,3 +98,41 @@ body {
     background-color: #3e8e41;
 }
 /*end of dropdown menu*/
+
+/*Toast Box*/
+.center {
+    text-align: center;
+}
+#toast{
+    position: fixed;
+    z-index: 1;
+    background-color: bisque;
+    color: #3e8e41;
+    left: 48vw;
+    margin-top: 5vh;
+    font-size: 30px;
+    text-align: center;
+    padding: 5px;
+    visibility: hidden;
+}
+#toast .show{
+    visibility: visible;
+    -webkit-animation: fade-in 0.5s, fade-out 0.5s 2.5s;
+    animation: fade-in 0.5s, fade-out 0.5s 2.5s;
+}
+@-webkit-keyframes fade-in{
+    from {top:0; opacity: 0;}
+    to {top: 5vh; opacity: 1;}
+}
+@keyframes fade-in {
+    from {top:0; opacity: 0;}
+    to {top: 5vh; opacity: 1;}
+}
+@-webkit-keyframes fade-out{
+    from {top:5vh; opacity: 1;}
+    to {top: 0; opacity: 0;}
+}
+@keyframes fade-out {
+    from {top:5vh; opacity: 1;}
+    to {top: 0; opacity: 0;}
+}

@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
         start.disabled = false;
         end.disabled = false;
         counter = 0;
+        makeToast("Reset");
     });
     start = document.getElementById('draw-start');
     end = document.getElementById('draw-end');
@@ -25,16 +26,19 @@ document.addEventListener("DOMContentLoaded", function() {
         end.checked = false;
         wall.checked = false;
         currentMode = 1;
+        makeToast("draw start point with left click");
     });
     end.addEventListener('click', function(){
         start.checked = false;
         wall.checked = false;
         currentMode = 2;
+        makeToast("draw end point with left click");
     });
     wall.addEventListener('click', function(){
         start.checked = false;
         end.checked = false;
         currentMode = 0;
+        makeToast("draw wall with dragging right click");
     });    
     document.getElementById("greedy-algorithm").addEventListener("click", function() {
         this.ai = new AI(game.board);
@@ -80,7 +84,7 @@ class Board {
                 cell.setAttribute("id", `${rowNum}-${colNum}`);
                 cell.innerHTML = this.board[rowNum][colNum];
                 cell.addEventListener("mouseover", function(e){
-                    console.log(e.buttons);
+                    //console.log(e.buttons);
                     if(e.buttons == 2 || e.buttons == 3){
                         var r = parseInt(e.target.id.split('-')[0]);
                         var c = parseInt(e.target.id.split('-')[1]);
@@ -114,6 +118,7 @@ class Board {
                                     if(!game.board.end){
                                         end.checked = true;
                                         currentMode = 2;
+                                        makeToast("draw end point with left click");
                                     }else{
                                         wall.checked = true;
                                         currentMode = 0;
@@ -130,6 +135,7 @@ class Board {
                                     if(!game.board.start){
                                         start.checked = true;
                                         currentMode = 2;
+                                        makeToast("draw start point with left click");
                                     }else{
                                         wall.checked = true;
                                         currentMode = 0;
@@ -161,6 +167,7 @@ class AI{
         this.path = [];
         this.findPath();
         this.found = false;
+        this.previousPoint = 10000000000;
     }
     findPath(){
         //Brutal force approach
@@ -172,7 +179,9 @@ class AI{
             var rowOfEnd = this.board.board.findIndex(row => row.includes('E'));
             var colOfEnd = this.board.board[rowOfEnd].findIndex(col => col == 'E');    
             
-            this.greedy_algorithm(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
+            for (let index = 0; index < 4; index++) {
+                this.greedy_algorithm(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
+            }
         }
     
     }
@@ -242,7 +251,9 @@ class AI{
             }
                 
         }
+        /*If previous distance between point to end is shorter, means the algorithm has been going back*/
         if(optimalPath != 10000000000){
+            this.previousPoint = optimalPath;
             this.board.board[rowOfStart][colOfStart] = 'X';
             /*Update the board view*/
             var cell = document.getElementById(`${rowOfStart}-${colOfStart}`);
@@ -281,3 +292,15 @@ function decrementCounter(){
     document.getElementById("counter").innerHTML = counter;
 }
 
+function makeToast(text){
+    const toast = document.getElementById('toast');
+    toast.innerText = text;
+    toast.className = "show"
+    console.log(toast);
+    toast.style.visibility = 'visible';
+
+    setTimeout(()=>{
+        toast.className = toast.className.replace('show','')
+        toast.style.visibility = 'hidden';
+    }, 3000);
+}
