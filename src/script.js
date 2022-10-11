@@ -193,12 +193,7 @@ class AI{
                 }
             }
             if(algorithm == "dijkstra"){
-                var found = await this.dijkstra(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
-                if(found){
-                    this.drawPath();
-                }else{
-                    makeToast("No path found");
-                }
+                await this.dijkstra(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
             }
         }
     
@@ -322,14 +317,10 @@ class AI{
                 incrementCounter();
                 await sleep(100);
                 this.dijkstra(move[0], move[1], rowOfEnd, colOfEnd);
-                if(this.found){
-                    return true;
-                }
             }
         }
         if(!this.found && this.path.length > 0){
             var lastMove = this.path.pop();
-            //decrementCounter();
             this.visited.add(`${rowOfStart}-${colOfStart}`);
             var row = parseInt(lastMove.split('-')[0]);
             var col = parseInt(lastMove.split('-')[1]);
@@ -337,8 +328,16 @@ class AI{
             this.dijkstra(row, col, rowOfEnd, colOfEnd);
         }
     }
-    async drawPath(rowOfStart, colOfStart, rowOfEnd, colOfEnd){
-        //draw the shortest path once dijsktra is done
+    drawPath(path){
+        //draw path
+        console.log('called ', path.length);
+        console.log(path)
+        for (let i = 0; i < path.length; i++) {
+            const move = path[i];
+            console.log(i);
+            var cell = document.getElementById(`${move}`);
+            cell.style.backgroundColor = "red";
+        }
     }
     
 }
