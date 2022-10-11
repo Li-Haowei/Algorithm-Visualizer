@@ -41,7 +41,13 @@ document.addEventListener("DOMContentLoaded", function() {
         makeToast("draw wall with dragging right click");
     });    
     document.getElementById("greedy-algorithm").addEventListener("click", function() {
-        this.ai = new AI(game.board);
+        this.ai = new AI(game.board, "greedy");
+    });
+    document.getElementById("super-greedy-algorithm").addEventListener("click", function() {
+        this.ai = new AI(game.board, "super-greedy");
+    });
+    document.getElementById("dijkstra").addEventListener("click", function() {
+        this.ai = new AI(game.board, "dijkstra");
     });
 });
 
@@ -159,18 +165,18 @@ class Board {
 //Create a AI class
 class AI{
     //constructor
-    constructor(board){
+    constructor(board, algorithm){
         //Initialize the AI
         this.approach = 0;
         this.board = board;
         this.visited = new Set([]);
         this.path = [];
-        this.findPath();
         this.found = false;
         this.previousPoint = 10000000000;
+        this.algorithm = algorithm;
+        this.findPath(algorithm);
     }
-    findPath(){
-        //Brutal force approach
+    async findPath(algorithm){
         if(this.board.start && this.board.end){
             var rowOfStart = this.board.board.findIndex(row => row.includes('S'));
             var colOfStart = this.board.board[rowOfStart].findIndex(col => col == 'S');
@@ -178,9 +184,21 @@ class AI{
             this.path.push(`${rowOfStart}-${colOfStart}`);
             var rowOfEnd = this.board.board.findIndex(row => row.includes('E'));
             var colOfEnd = this.board.board[rowOfEnd].findIndex(col => col == 'E');    
-            
-            for (let index = 0; index < 4; index++) {
+            //Greedy algorithm
+            if(algorithm == "greedy"){
                 this.greedy_algorithm(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
+            }else if (algorithm == "super-greedy"){
+                for (let index = 0; index < 4; index++) {
+                    this.greedy_algorithm(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
+                }
+            }
+            if(algorithm == "dijkstra"){
+                var found = await this.dijkstra(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
+                if(found){
+                    this.drawPath();
+                }else{
+                    makeToast("No path found");
+                }
             }
         }
     
@@ -277,6 +295,51 @@ class AI{
         }
 
     }
+    async dijkstra(rowOfStart, colOfStart, rowOfEnd, colOfEnd){
+        if(this.found){
+            return true;
+        }
+        var possiblePaths = this.updateNeighbors(rowOfStart, colOfStart);
+        for (let i = 0; i < possiblePaths.length; i++) {
+            const move = possiblePaths[i];
+            if(this.board.board[move[0]][move[1]] == 'O'){
+                console.log("hit wall");
+                this.visited.add(`${move[0]}-${move[1]}`);
+            }
+            if (this.board.board[move[0]][move[1]] == 'E') {
+                console.log("Found the end");
+                this.found = true;
+                return true;
+            }
+            if(!this.visited.has(`${move[0]}-${move[1]}`)){
+                this.board.board[move[0]][move[1]] = 'X';
+                /*Update the board view*/
+                var cell = document.getElementById(`${move[0]}-${move[1]}`);
+                /*Mark as visited*/
+                this.path.push(`${move[0]}-${move[1]}`);
+                this.visited.add(`${move[0]}-${move[1]}`);
+                cell.style.backgroundColor = "black";
+                incrementCounter();
+                await sleep(100);
+                this.dijkstra(move[0], move[1], rowOfEnd, colOfEnd);
+                if(this.found){
+                    return true;
+                }
+            }
+        }
+        if(!this.found && this.path.length > 0){
+            var lastMove = this.path.pop();
+            //decrementCounter();
+            this.visited.add(`${rowOfStart}-${colOfStart}`);
+            var row = parseInt(lastMove.split('-')[0]);
+            var col = parseInt(lastMove.split('-')[1]);
+            await sleep(100);
+            this.dijkstra(row, col, rowOfEnd, colOfEnd);
+        }
+    }
+    async drawPath(rowOfStart, colOfStart, rowOfEnd, colOfEnd){
+        //draw the shortest path once dijsktra is done
+    }
     
 }
 function sleep(ms) {
@@ -295,8 +358,7 @@ function decrementCounter(){
 function makeToast(text){
     const toast = document.getElementById('toast');
     toast.innerText = text;
-    toast.className = "show"
-    console.log(toast);
+    toast.className = "show";
     toast.style.visibility = 'visible';
 
     setTimeout(()=>{
