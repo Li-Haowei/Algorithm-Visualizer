@@ -49,6 +49,130 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("dijkstra").addEventListener("click", function() {
         this.ai = new AI(game.board, "dijkstra");
     });
+
+    //get image uploaded from html
+    function handleFileSelect(evt) {
+        //remove all the previous elements
+        document.getElementById('image-container').innerHTML = "";
+        document.getElementById('grayscaled-image-container').innerHTML = "";
+        document.getElementById('scaled-image-container').innerHTML = "";
+        //get image uploaded from html and display in image-container
+        var files = evt.target.files; // FileList object
+        var f = files[0];
+        var reader = new FileReader();
+        reader.onload = (function(theFile) {
+            return function(e) {
+                var span = document.createElement('span');
+                span.innerHTML = ['<img class="thumb" src="', e.target.result,
+                    '" title="', escape(theFile.name), '"/>'
+                ].join('');
+                document.getElementById('image-container').insertBefore(span, null);
+            };
+        }
+        )(f);
+        reader.readAsDataURL(f);
+        //get image data and turn into 3d array
+        var img = new Image();
+        img.src = URL.createObjectURL(f);
+        img.onload = function() {
+            var canvas = document.createElement("canvas");
+            canvas.width = this.width;
+            canvas.height = this.height;
+            var width = canvas.width;
+            var height = canvas.height;
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(this, 0, 0);
+            var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            var data = imgData.data;
+            
+            
+            var arr = [];
+            for (var i = 0; i < data.length; i += 4) {
+                arr.push([data[i], data[i + 1], data[i + 2]]);
+            }
+            var width = canvas.width;
+            var height = canvas.height;
+            var result = [];
+            for (var i = 0; i < height; i++) {
+                var start = i * width;
+                var end = start + width;
+                result.push(arr.slice(start, end));
+            }
+            //get image dimensions
+            var imageWidth = result[0].length;
+            var imageHeight = result.length;
+            imageWidth = imageWidth/100;
+            imageHeight = imageHeight/80;
+            //scale down the image to 80*100 by its height and width
+            var scaledResult = [];
+            for (var i = 0; i < 80; i++) {
+                scaledResult.push([]);
+                for (var j = 0; j < 100; j++) {
+                    scaledResult[i].push(result[Math.floor(i * imageHeight)][Math.floor(j * imageWidth)]);
+                }
+            }
+            
+            //gray scale the image
+            for (var i = 0; i < result.length; i++) {
+                for (var j = 0; j < result[i].length; j++) {
+                    var gray = Math.round((result[i][j][0] + result[i][j][1] + result[i][j][2]) / 3);
+                    result[i][j] = gray;
+                }
+            }
+            //turn 3d array image back to image
+            var imgData = ctx.createImageData(width, height);
+            for (var i = 0; i < result.length; i++) {
+                for (var j = 0; j < result[i].length; j++) {
+                    var index = (i * width + j) * 4;
+                    imgData.data[index + 0] = result[i][j];
+                    imgData.data[index + 1] = result[i][j];
+                    imgData.data[index + 2] = result[i][j];
+                    imgData.data[index + 3] = 255;
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
+            //display the image in html
+            var img = new Image();
+            img.src = canvas.toDataURL();
+            document.getElementById('grayscaled-image-container').appendChild(img);
+            
+            //clear ctx
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            //gray scale the image
+            for (var i = 0; i < scaledResult.length; i++) {
+                for (var j = 0; j < scaledResult[i].length; j++) {
+                    var gray = Math.round((scaledResult[i][j][0] + scaledResult[i][j][1] + scaledResult[i][j][2]) / 3);
+                    scaledResult[i][j] = gray;
+                }
+            }
+            //turn scaled 3d array image back to image
+            var scaledImgData = ctx.createImageData(100, 80);
+            for (var i = 0; i < scaledResult.length; i++) {
+                for (var j = 0; j < scaledResult[i].length; j++) {
+                    var index = (i * 100 + j) * 4;
+                    scaledImgData.data[index + 0] = scaledResult[i][j];
+                    scaledImgData.data[index + 1] = scaledResult[i][j];
+                    scaledImgData.data[index + 2] = scaledResult[i][j];
+                    scaledImgData.data[index + 3] = 255;
+                }
+            }
+            ctx.putImageData(scaledImgData, 0, 0);
+            //display the image in html
+            var img = new Image();
+            img.src = canvas.toDataURL();
+            document.getElementById('scaled-image-container').appendChild(img);
+
+            //remove current board
+            document.getElementById('board').innerHTML = "";
+            //create a new board with the image
+            game.board = new Board(80, 100, scaledResult);
+
+        }
+
+    }
+    document.getElementById('file').addEventListener('change', handleFileSelect, false); 
+
+
 });
 
 //Create a game class
@@ -62,15 +186,20 @@ function Game() {
 //Create a board class
 class Board {
     //constructor
-    constructor(rows, columns){
+    constructor(rows, columns, result=null) {
         //Initialize the board view
         this.rows = rows;
         this.columns = columns;
         this.board = [];
         this.initBoardView();
-        this.initHtmlBoardView();
         this.start = false;
         this.end = false;
+        if (result == null) {
+            this.initHtmlBoardView();
+        }
+        else {
+            this.initHtmlBoardViewWithResult(result);
+        }
     }
     //Initialize the board view
     initBoardView() {
@@ -79,6 +208,7 @@ class Board {
            this.board.push(new Array(this.columns).fill(' '));
         }
     }
+    
     //Initialize html board view
     initHtmlBoardView(){
         //Create a new instance of the html board view
@@ -160,6 +290,93 @@ class Board {
             htmlBoard.appendChild(row);
         }
     }
+
+    //Initialize html board view with gray scaled image
+    initHtmlBoardViewWithResult(result){
+        //Create a new instance of the html board view
+        var htmlBoard = document.getElementById("board");
+        for (let rowNum = 0; rowNum < this.rows; rowNum++) {
+            var row = document.createElement("tr");
+            for (let colNum = 0; colNum < this.columns; colNum++) {
+                var cell = document.createElement("td");
+                cell.setAttribute("id", `${rowNum}-${colNum}`);
+                cell.innerHTML = this.board[rowNum][colNum];
+                cell.addEventListener("mouseover", function(e){
+                    //console.log(e.buttons);
+                    if(e.buttons == 2 || e.buttons == 3){
+                        var r = parseInt(e.target.id.split('-')[0]);
+                        var c = parseInt(e.target.id.split('-')[1]);
+                        switch (currentMode) {
+                            case 0:
+                                game.board.board[r][c] = 'O';
+                                e.target.style.backgroundColor = "blue";
+                                break;
+                            case 1:
+                                break;
+                            case 2:
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    return false;
+                });
+                cell.addEventListener("click", function(e){
+                        var r = parseInt(e.target.id.split('-')[0]);
+                        var c = parseInt(e.target.id.split('-')[1]);
+                        switch (currentMode) {
+                            case 0:
+                                break;
+                            case 1:
+                                if(!game.board.start){
+                                    game.board.board[r][c] = 'S';
+                                    e.target.style.backgroundColor = "green";
+                                    game.board.start = true;
+
+                                    if(!game.board.end){
+                                        end.checked = true;
+                                        currentMode = 2;
+                                        makeToast("draw end point with left click");
+                                    }else{
+                                        wall.checked = true;
+                                        currentMode = 0;
+                                    }
+                                    start.checked = false;
+                                    start.disabled = true;
+                                }
+                                break;
+                            case 2:
+                                if(!game.board.end){
+                                    game.board.board[r][c] = 'E';
+                                    e.target.style.backgroundColor = "red";
+                                    game.board.end = true;
+                                    if(!game.board.start){
+                                        start.checked = true;
+                                        currentMode = 2;
+                                        makeToast("draw start point with left click");
+                                    }else{
+                                        wall.checked = true;
+                                        currentMode = 0;
+                                    }
+                                    end.checked = false;
+                                    end.disabled = true;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    return false;
+                });
+                row.appendChild(cell);
+
+                //Set color of cell based on grayscale value
+                var gray = result[rowNum][colNum];
+                cell.style.backgroundColor = `rgb(${gray},${gray},${gray})`;
+            }
+            htmlBoard.appendChild(row);
+        }
+    }
+
 }
 
 //Create a AI class
@@ -365,3 +582,5 @@ function makeToast(text){
         toast.style.visibility = 'hidden';
     }, 3000);
 }
+
+

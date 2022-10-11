@@ -136,3 +136,10 @@ body {
     from {top:5vh; opacity: 1;}
     to {top: 0; opacity: 0;}
 }
+
+/*end of toast box*/
+.horizontal {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
