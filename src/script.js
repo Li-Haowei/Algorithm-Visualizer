@@ -6,16 +6,22 @@ var start = document.getElementById('draw-start');
 var end = document.getElementById('draw-end');
 var wall = document.getElementById('draw-wall');
 var counter = 0; // to keep track of current count of total steps
+var boardHeight = 160;
+var boardWidth = 200;
 //Run functions when document is ready
 document.addEventListener("DOMContentLoaded", function() {
     //Create a new instance of the game
     game = new Game();
     document.getElementById("reset").addEventListener("click", function() {
+        /*
         document.getElementById("board").innerHTML = "";
         game = new Game();
         start.disabled = false;
         end.disabled = false;
         counter = 0;
+        */
+       //when reset is pressed, reload the whole page
+         location.reload();
         makeToast("Reset");
     });
     start = document.getElementById('draw-start');
@@ -101,13 +107,13 @@ document.addEventListener("DOMContentLoaded", function() {
             //get image dimensions
             var imageWidth = result[0].length;
             var imageHeight = result.length;
-            imageWidth = imageWidth/100;
-            imageHeight = imageHeight/80;
+            imageWidth = imageWidth/boardWidth;
+            imageHeight = imageHeight/boardHeight;
             //scale down the image to 80*100 by its height and width
             var scaledResult = [];
-            for (var i = 0; i < 80; i++) {
+            for (var i = 0; i < boardHeight; i++) {
                 scaledResult.push([]);
-                for (var j = 0; j < 100; j++) {
+                for (var j = 0; j < boardWidth; j++) {
                     scaledResult[i].push(result[Math.floor(i * imageHeight)][Math.floor(j * imageWidth)]);
                 }
             }
@@ -146,10 +152,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
             //turn scaled 3d array image back to image
-            var scaledImgData = ctx.createImageData(100, 80);
+            var scaledImgData = ctx.createImageData(boardWidth, boardHeight);
             for (var i = 0; i < scaledResult.length; i++) {
                 for (var j = 0; j < scaledResult[i].length; j++) {
-                    var index = (i * 100 + j) * 4;
+                    var index = (i * boardWidth + j) * 4;
                     scaledImgData.data[index + 0] = scaledResult[i][j];
                     scaledImgData.data[index + 1] = scaledResult[i][j];
                     scaledImgData.data[index + 2] = scaledResult[i][j];
@@ -165,20 +171,26 @@ document.addEventListener("DOMContentLoaded", function() {
             //remove current board
             document.getElementById('board').innerHTML = "";
             //create a new board with the image
-            game.board = new Board(80, 100, scaledResult);
+            game.board = new Board(boardHeight, boardWidth, scaledResult);
 
         }
 
     }
     document.getElementById('file').addEventListener('change', handleFileSelect, false); 
 
+    //get html slide bar and every time it changes, hightlight the walls of board
+    document.getElementById("myRange").addEventListener("input", function() {
+        game.board.setWallThreshold(this.value);
+        game.board.highlightWalls();
+    }
+    );
 
 });
 
 //Create a game class
 function Game() {
     //Create a new instance of the board
-    this.board = new Board(80, 100);
+    this.board = new Board(boardHeight, boardWidth);
     //Create a new instance of the AI
     this.ai = new AI(this.board);
 }
@@ -194,12 +206,14 @@ class Board {
         this.initBoardView();
         this.start = false;
         this.end = false;
+        this.scaledImgData = result;
         if (result == null) {
             this.initHtmlBoardView();
         }
         else {
             this.initHtmlBoardViewWithResult(result);
         }
+        this.wallThreshold = 0;
     }
     //Initialize the board view
     initBoardView() {
@@ -375,6 +389,29 @@ class Board {
             }
             htmlBoard.appendChild(row);
         }
+    }
+    setWallThreshold(threshold){
+        this.wallThreshold = threshold;
+    }
+    //Highlight the walls of the board based on gray scale image and slider value
+    highlightWalls(){
+        var htmlBoard = document.getElementById("board");
+        for (let rowNum = 0; rowNum < this.rows; rowNum++) {
+            for (let colNum = 0; colNum < this.columns; colNum++) {
+                var cell = document.getElementById(`${rowNum}-${colNum}`);
+                //get rgb value of corresponding scaledImgData
+                var gray = this.scaledImgData[rowNum][colNum];
+                if(gray < this.wallThreshold){
+                    this.board[rowNum][colNum] = 'O';
+                    cell.style.backgroundColor = "blue";
+                }else{
+                    this.board[rowNum][colNum] = ' ';
+                    var gray = this.scaledImgData[rowNum][colNum];
+                    cell.style.backgroundColor = `rgb(${gray},${gray},${gray})`;
+                }
+            }
+        }
+
     }
 
 }

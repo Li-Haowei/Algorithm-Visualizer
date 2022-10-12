@@ -62,7 +62,13 @@
     <div id="upload-image">
         <input type="file" id="file" accept="image/*">
     </div>
-    <div class="horizontal">
+    <!--slide bar-->
+    <div id="slide-bar">
+        <input type="range" min="1" max="255" value="50" class="slider" id="myRange">
+    </div>
+    
+    <!--processed image-->
+    <div class="horizontal" style="display: none;">
         <div id="image-container">
         </div>
         <div id="grayscaled-image-container">
@@ -70,5 +76,6 @@
         <div id="scaled-image-container">
         </div>
     </div>
+    <!--End of processed image-->
 </body>
 </html>
