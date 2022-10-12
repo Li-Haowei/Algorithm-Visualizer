@@ -8,22 +8,44 @@ var wall = document.getElementById('draw-wall');
 var counter = 0; // to keep track of current count of total steps
 var boardHeight = 160;
 var boardWidth = 200;
+var wallColor = 'blue';
+var pathColor = 'black';
 //Run functions when document is ready
 document.addEventListener("DOMContentLoaded", function() {
     //Create a new instance of the game
     game = new Game();
     document.getElementById("reset").addEventListener("click", function() {
-        /*
-        document.getElementById("board").innerHTML = "";
-        game = new Game();
-        start.disabled = false;
-        end.disabled = false;
-        counter = 0;
-        */
        //when reset is pressed, reload the whole page
-         location.reload();
+        location.reload();
         makeToast("Reset");
     });
+
+    //add event listener to color options: wall-color, path-color, 1 to 3
+    document.getElementById("wall-color-1").addEventListener("click", function() {
+        wallColor = 'blue';
+        makeToast("Wall Color: Blue");
+    });
+    document.getElementById("wall-color-2").addEventListener("click", function() {
+        wallColor = 'yellow';
+        makeToast("Wall Color: Yellow");
+    });
+    document.getElementById("wall-color-3").addEventListener("click", function() {
+        wallColor = 'purple';
+        makeToast("Wall Color: Purple");
+    });
+    document.getElementById("path-color-1").addEventListener("click", function() {
+        pathColor = 'black';
+        makeToast("Path Color: Black");
+    });
+    document.getElementById("path-color-2").addEventListener("click", function() {
+        pathColor = 'orange';
+        makeToast("Path Color: Orange");
+    });
+    document.getElementById("path-color-3").addEventListener("click", function() {
+        pathColor = 'pink';
+        makeToast("Path Color: Pink");
+    });
+
     start = document.getElementById('draw-start');
     end = document.getElementById('draw-end');
     wall = document.getElementById('draw-wall');
@@ -241,7 +263,7 @@ class Board {
                         switch (currentMode) {
                             case 0:
                                 game.board.board[r][c] = 'O';
-                                e.target.style.backgroundColor = "blue";
+                                e.target.style.backgroundColor = wallColor;
                                 break;
                             case 1:
                                 break;
@@ -323,7 +345,7 @@ class Board {
                         switch (currentMode) {
                             case 0:
                                 game.board.board[r][c] = 'O';
-                                e.target.style.backgroundColor = "blue";
+                                e.target.style.backgroundColor = wallColor;
                                 break;
                             case 1:
                                 break;
@@ -403,7 +425,7 @@ class Board {
                 var gray = this.scaledImgData[rowNum][colNum];
                 if(gray < this.wallThreshold){
                     this.board[rowNum][colNum] = 'O';
-                    cell.style.backgroundColor = "blue";
+                    cell.style.backgroundColor = wallColor;
                 }else{
                     this.board[rowNum][colNum] = ' ';
                     var gray = this.scaledImgData[rowNum][colNum];
@@ -527,7 +549,7 @@ class AI{
             /*Mark as visited*/
             this.path.push(`${rowOfStart}-${colOfStart}`);
             //this.visited.add(`${rowOfStart}-${colOfStart}`);
-            cell.style.backgroundColor = "black";
+            cell.style.backgroundColor = pathColor;
             incrementCounter();
             await sleep(100);
             this.greedy_algorithm(rowOfStart, colOfStart, rowOfEnd, colOfEnd);
