@@ -1,6 +1,6 @@
 # Algorithm-Visualizer
 It visualize the pre-programmed algorithm I have written to find the shortest path between two points. <br>
-(Currently only 2, because I realize in this project the ones I have is good enough, but I will add more)<br>
+(Currently only 2, because I realize in this project the ones I have is good enough, but I will add more)<br> <br>
 The user can select their action in menu: draw start, draw end, draw wall. <br>
 (Color changing option is available so you can have different color of walls and paths) <br> <br>
 For more usablity and mostly for fun, I have added picture upload option, such that user can upload their image, whether it's a map or a picture of cat, <br>
