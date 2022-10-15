@@ -12,6 +12,7 @@ class Board {
         this.start = false;
         this.end = false;
         this.scaledImgData = result;
+        this.imgViaUpload = null;
         if (result == null) {
             this.initHtmlBoardView();
         }
@@ -202,13 +203,15 @@ class Board {
             }
             htmlBoard.appendChild(row);
         }
+        if(game.boardMode === 'no-grids'){
+            this.removeBorders(this.imgViaUpload);
+        }
     }
     setWallThreshold(threshold){
         this.wallThreshold = threshold;
     }
     //Highlight the walls of the board based on gray scale image and slider value
     highlightWalls(){
-        var htmlBoard = document.getElementById("board");
         for (let rowNum = 0; rowNum < this.rows; rowNum++) {
             for (let colNum = 0; colNum < this.columns; colNum++) {
                 var cell = document.getElementById(`${rowNum}-${colNum}`);
@@ -224,7 +227,59 @@ class Board {
                 }
             }
         }
+        //if the mode is viewSmooth, set viewSmooth
+        if(game.boardMode === 'smooth'){
+            this.viewSmooth(game.imgViaUpload);
+        }
+    }
 
+    //remove all borders of grids
+    removeBorders(){
+        var htmlBoard = document.getElementById("board");
+        for (let rowNum = 0; rowNum < this.rows; rowNum++) {
+            for (let colNum = 0; colNum < this.columns; colNum++) {
+                var cell = document.getElementById(`${rowNum}-${colNum}`);
+                cell.style.border = "0px";
+            }
+        }
+    }
+
+    addBorders(){
+        var htmlBoard = document.getElementById("board");
+        for (let rowNum = 0; rowNum < this.rows; rowNum++) {
+            for (let colNum = 0; colNum < this.columns; colNum++) {
+                var cell = document.getElementById(`${rowNum}-${colNum}`);
+                cell.style.border = "1px solid var(--board-border-color)";
+            }
+        }
+    }
+
+    //This function makes the uploaded image as a background image of the whole board
+    viewSmooth(imgViaUpload){
+        //remove the current color of all the grids
+        for (let rowNum = 0; rowNum < this.rows; rowNum++) {
+            for (let colNum = 0; colNum < this.columns; colNum++) {
+                var cell = document.getElementById(`${rowNum}-${colNum}`);
+                cell.style.backgroundColor = "transparent";
+            }
+        }
+
+        //set the imgViaUpload as background image of the board
+        var htmlBoard = document.getElementById("board");
+        var imgString = imgViaUpload.src;
+        htmlBoard.style.backgroundImage = `url(${imgString})`;
+        htmlBoard.style.backgroundSize = "cover";
+        htmlBoard.style.backgroundRepeat = "no-repeat";
+        htmlBoard.style.backgroundPosition = "center";
+        
+
+        //make the background image of the board visible by making grids transparent
+        for (let rowNum = 0; rowNum < this.rows; rowNum++) {
+            for (let colNum = 0; colNum < this.columns; colNum++) {
+                var cell = document.getElementById(`${rowNum}-${colNum}`);
+                cell.style.border = "0px";
+            }
+        }
     }
 
 }

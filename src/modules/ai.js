@@ -93,7 +93,6 @@ class AI{
                 }
             }
             if(this.board.board[move[0]][move[1]] == 'O'){
-                console.log("hit wall");
                 this.visited.add(`${rowOfStart}-${colOfStart}`);
             }
             if (this.board.board[move[0]][move[1]] == 'E') {
@@ -137,7 +136,6 @@ class AI{
         for (let i = 0; i < possiblePaths.length; i++) {
             const move = possiblePaths[i];
             if(this.board.board[move[0]][move[1]] == 'O'){
-                console.log("hit wall");
                 this.visited.add(`${move[0]}-${move[1]}`);
             }
             if (this.board.board[move[0]][move[1]] == 'E') {

@@ -12,6 +12,8 @@ var wall = document.getElementById('draw-wall');
 var counter = 0; // to keep track of current count of total steps
 var boardHeight = 160;
 var boardWidth = 200;
+//image uploaded var
+var imgViaUpload;
 //Run functions when document is ready
 document.addEventListener("DOMContentLoaded", function() {
     //Create a new instance of the game
@@ -104,6 +106,7 @@ document.addEventListener("DOMContentLoaded", function() {
         //get image data and turn into 3d array
         var img = new Image();
         img.src = URL.createObjectURL(f);
+        imgViaUpload = img;
         img.onload = function() {
             var canvas = document.createElement("canvas");
             canvas.width = this.width;
@@ -209,6 +212,29 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     );
 
+
+    //if no grid is selected, remove the border of the grids
+    document.getElementById('view-no-grids').addEventListener('click', function() {
+        game.board.removeBorders();
+        game.boardMode = 'no-grids';
+        makeToast('Grids are removed');
+    });
+
+    //if grid is selected, add the border of the grids
+    document.getElementById('view-grids').addEventListener('click', function() {
+        game.board.addBorders();
+        game.boardMode = 'grids';
+        makeToast('Grids are added');
+    });
+
+    //if smooth is selected, remove the border of the grids and make the image uploaded as background
+    document.getElementById('view-smooth').addEventListener('click', function() {
+        game.board.viewSmooth(imgViaUpload);
+        game.imgViaUpload = imgViaUpload;
+        game.boardMode = 'smooth';
+        makeToast('Smooth view is added');
+    });
+
 });
 
 //Create a game class
@@ -220,6 +246,8 @@ function Game() {
     this.currentMode = 0;
     this.wallColor = 'blue'
     this.pathColor = 'black'
+    this.boardMode = 'grids';
+    this.imgViaUpload = null;
 }
 
 
