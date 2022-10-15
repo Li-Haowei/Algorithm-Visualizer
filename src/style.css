@@ -1,16 +1,30 @@
+/*root and set vars for all the colors used*/
+:root {
+  --board-color: antiquewhite;
+  --board-border-color: #13eea5;
+  --nav-main-color: #333;
+  --nav-hover-color: #959998;
+  --black: black;
+  --nav-a-color: #fff;
+  --nav-a-background-color: #ddd;
+  --nav-a-active-color: #4CAF50;
+  --dropdown-content-background-color: #f9f9f9;
+}
+
+
 
 #board {
     margin: 10px 10px;
 }
 #board td {
-    border: 1px solid #14eea5;
+    border: 1px solid var(--board-border-color);
     text-align: center;
     vertical-align: middle;
     height: 6px;
     width: 6px;
     font-weight: bold;
     overflow: hidden;
-    background-color: antiquewhite;
+    background-color: var(--board-color);
 }
 #container {
     display: flex;
@@ -19,29 +33,29 @@
 }
 #controller{
     text-align: center;
-    background-color: antiquewhite;
+    background-color: var(--board-color);
     display: none;
 }
 /*navigation bar*/
 .navbar {
     overflow: hidden;
-    background-color: #333;
+    background-color: var(--nav-main-color);
     font-family: Arial, Helvetica, sans-serif;
 }
 .navbar a {
     float: left;
     font-size: 16px;
-    color: white;
+    color: var(--nav-a-color);
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
 }
 .navbar a:hover {
-    background-color: #ddd;
-    color: black;
+    background-color: var(--nav-a-background-color);
+    color: var(--black);
 }
 .navbar a.active {
-    background-color: #4CAF50;
+    background-color: var(--nav-a-active-color);
     color: white;
 }
 /*place counter to the end of navigation bar*/
@@ -60,7 +74,7 @@ body {
 }
 /*Dropdown menu*/
 .dropbtn {
-    background-color: #333;
+    background-color: var(--nav-main-color);
     margin: 2px;
     color: white;
     padding: 16px;
@@ -75,7 +89,7 @@ body {
 .dropdown-content {
     display: none;
     position: fixed;
-    background-color: #f9f9f9;
+    background-color: var(--dropdown-content-background-color);
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
@@ -87,13 +101,13 @@ body {
     display: block;
     cursor: pointer;
 }
-.dropdown-content a:hover {background-color: #3e8e41}
+.dropdown-content a:hover {background-color: var(--nav-hover-color)}
 .dropdown:hover .dropdown-content {
     display: flex;
     flex-direction: column;
 }
 .dropdown:hover .dropbtn {
-    background-color: #3e8e41;
+    background-color: var(--nav-hover-color);
 }
 /*
 <div class="dropdown">
@@ -131,7 +145,7 @@ body {
 .sub-dropdown-content {
     display: none;
     position: absolute;
-    background-color: #f9f9f9;
+    background-color: var(--dropdown-content-background-color);
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
@@ -139,19 +153,19 @@ body {
     top: 0;
 }
 .sub-dropdown-content a {
-    color: black;
+    color: var(--black);
     padding: 12px 16px;
     text-decoration: none;
     display: block;
     cursor: pointer;
 }
-.sub-dropdown-content a:hover {background-color: #3e8e41}
+.sub-dropdown-content a:hover {background-color: var(--nav-hover-color)}
 .sub-dropdown:hover .sub-dropdown-content {
     display: flex;
     flex-direction: column;
 }
 .sub-dropdown:hover .sub-dropbtn {
-    background-color: #3e8e41;
+    background-color: var(--nav-hover-color);
 }
 /*end of dropdown menu*/
 

@@ -6,8 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--Import Style-->
     <link rel="stylesheet" href="style.css">
+    <!--Import board class-->
+    <script src="modules/board.js" type="module">
+      import Board from "./scripts/board.js"
+    </script>
+    <!--Import AI class-->
+    <script src="modules/ai.js" type="module">
+        import AI from "./scripts/ai.js"
+    </script>
     <!--Import JavaScript-->
-    <script src="script.js"></script>
+    <script src="script.js" type="module"></script>
     <!--Import JQuery-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="shortcut icon" href="#">
@@ -67,6 +75,16 @@
                                 <a id="path-color-3">Pink</a>
                             </div>
                     </div>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Theme
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a id="view-grids">Grids (Default)</a>
+                    <a id="view-no-grids">No Grids</a>
+                    <a id="view-smooth">Smooth</a>
                 </div>
             </div>
             <!--Counter-->
