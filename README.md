@@ -27,6 +27,7 @@ The app is ready to be deployed!
 ### find path
 #### with grids
 <img src='./src/images/findPath1.gif'/>
+
 #### without grids
 <img src='./src/images/findPath2.gif'/>
 
