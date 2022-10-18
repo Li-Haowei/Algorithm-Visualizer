@@ -24,4 +24,4 @@ The app is ready to be deployed!
 ## Demo
 
 #### find path
-<img src='src/images/findPath1'/>
+<img src='./src/images/findPath1'/>
