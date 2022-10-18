@@ -32,7 +32,7 @@ The app is ready to be deployed!
 <img src='./src/images/findPath2.gif'/>
 
 ### upload image
-<img src='./src/images/uploadimg.gif'/>
+<img src='./src/images/uploadImg.gif'/>
 
 ### auto highlight
 <img src='./src/images/auto-highlight.gif'/>
